@@ -149,25 +149,16 @@
 		<module name="PackageDeclaration"/>
 		<module name="PackageName">
 			<!-- require a package following the following structure:
-			base package name: net.wovenmc.woven
-			+ api/implementation/mixin subpackage: api/impl/mixin
-			+ client/dedicated server/common env subpackage: client/server/<nothing>
-			+ module name subpackage, singular, may contain multiple .-separated parts
+			base package name: net.wovenmc.woven.gradle
 			+ other subpackages as needed, all singular
 
 			The regex works as follows:
 			It matches (=succeeds) for one of these cases:
 			- net.wovenmc.woven.gradle[.<extra packages...>]
-			where <module-name> is a set of '.'-separated words, all in singular and not starting with client. or server.
-			and <version> is a positive integer (1, 2, 3, ...)
 			and <extra packages...> is a set of '.'-separated words with all the first potentially containing digits.
-			Negative lookahead ensures that client/server can't be replaced with common disguised as the module name.
 
 			The regex is implemented in 3 parts:
-			- the net.wovenmc.woven. prefix
-			- patterns for
-				- api packages: api + <not common> + client/server/nothing + <module-name>
-				- impl+mixin packages : impl/mixin + <not common> + client/server/nothing + <module-name>
+			- the net.wovenmc.woven.gradle prefix
 			- largely unconstrained trailing subpackages
 			-->
 			<property name="format"

@@ -1,0 +1,80 @@
+plugins {
+	id 'java-library'
+	id 'java-gradle-plugin'
+	id 'checkstyle'
+	id 'maven-publish'
+	id 'net.minecrell.licenser' version '0.4.1'
+}
+
+group = 'net.wovenmc'
+archivesBaseName = 'woven-gradle'
+def baseVersion = '0.1'
+
+def build = 'local'
+def ENV = System.getenv()
+if (ENV.BUILD_NUMBER) {
+	build = "automatic #${ENV.BUILD_NUMBER}"
+	version = "${baseVersion}.${ENV.BUILD_NUMBER}"
+} else {
+	version = "${baseVersion}.local"
+}
+
+repositories {
+	maven {
+		name = 'Fabric'
+		url = 'https://maven.fabricmc.net/'
+	}
+	mavenCentral()
+}
+
+dependencies {
+	api 'net.fabricmc:fabric-loom:0.5.25'
+	api 'org.jetbrains:annotations:17.0.0'
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+
+	withSourcesJar()
+	withJavadocJar()
+}
+
+jar {
+	from 'LICENSE'
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+javadoc {
+	options {
+		source = '8'
+		encoding = 'UTF-8'
+		charSet = 'UTF-8'
+		memberLevel = JavadocMemberLevel.PACKAGE
+		links(
+				'https://guava.dev/releases/21.0/api/docs/',
+				'https://asm.ow2.io/javadoc/',
+				'https://docs.oracle.com/javase/8/docs/api/',
+				'https://logging.apache.org/log4j/2.x/log4j-api/apidocs/'
+		)
+		// Disable the crazy super-strict doclint tool in Java 8
+		addStringOption('Xdoclint:none', '-quiet')
+	}
+
+	classpath = sourceSets.main.compileClasspath
+	include('**/woven/gradle/**')
+	failOnError false
+}
+
+license {
+	header file('HEADER')
+	include '**/*.java'
+}
+
+checkstyle {
+	configFile = file('checkstyle.xml')
+	toolVersion = '8.31'
+}
