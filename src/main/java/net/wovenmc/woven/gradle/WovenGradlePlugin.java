@@ -118,13 +118,12 @@ public class WovenGradlePlugin implements Plugin<Project> {
 					final TaskCollection<AbstractArchiveTask> archiveTasks = tasks.withType(AbstractArchiveTask.class);
 
 					// Artifacts
-					final RemapJarTask remapJarTask = (RemapJarTask) archiveTasks.getByName("rempapJar");
-					publication.artifact(remapJarTask, artifact -> {
-						artifact.builtBy(remapJarTask);
-					});
+					final RemapJarTask remapJarTask = (RemapJarTask) archiveTasks.getByName("remapJar");
+					publication.artifact(remapJarTask);
 
 					publication.artifact(archiveTasks.getByName("sourcesJar"), artifact -> {
-						artifact.builtBy(archiveTasks.getByName("remapSourcesJar"));
+						// Not using archiveTasks because loom stupidity.
+						artifact.builtBy(tasks.getByName("remapSourcesJar"));
 					});
 
 					publication.artifact(archiveTasks.getByName("javadocJar"));
@@ -150,6 +149,11 @@ public class WovenGradlePlugin implements Plugin<Project> {
 						});
 					});
 				});
+			});
+
+			ext.repositories(repositories -> {
+				repositories.mavenLocal();
+				// @TODO: Woven Maven
 			});
 		});
 	}

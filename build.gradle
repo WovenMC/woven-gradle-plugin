@@ -34,10 +34,10 @@ repositories {
 
 dependencies {
 	api 'org.jetbrains:annotations:20.1.0'
+	api 'gradle.plugin.net.minecrell:licenser:0.4.1'
 
 	implementation gradleApi()
 	implementation 'net.fabricmc:fabric-loom:0.5.25'
-	implementation 'gradle.plugin.net.minecrell:licenser:0.4.1'
 }
 
 java {
@@ -49,6 +49,9 @@ java {
 }
 
 jar {
+	manifest {
+		attributes 'Implementation-Version': project.version + ' Build(' + build + ')'
+	}
 	from 'LICENSE'
 }
 
@@ -99,10 +102,12 @@ gradlePlugin {
 
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
-			artifact jar
-			artifact sourcesJar
-			artifact javadocJar
+		plugin(MavenPublication) {
+			groupId project.group
+			artifactId project.archivesBaseName
+			version project.version
+
+			from components['java']
 
 			pom {
 				name = "Woven Gradle Plugin"

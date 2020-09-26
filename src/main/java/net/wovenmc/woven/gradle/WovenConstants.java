@@ -17,10 +17,10 @@
 package net.wovenmc.woven.gradle;
 
 import org.gradle.external.javadoc.JavadocMemberLevel;
-import org.gradle.internal.impldep.com.google.common.collect.ImmutableList;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,14 +43,14 @@ public class WovenConstants {
 	public static final class JavaDoc {
 		public static final String INCLUDE = "**/api/**";
 		public static final JavadocMemberLevel MEMBER_LEVEL = JavadocMemberLevel.PACKAGE;
-		public static final @Unmodifiable List<String> LINKS = ImmutableList.of(
+		public static final @Unmodifiable List<String> LINKS = Collections.unmodifiableList(Arrays.asList(
 				"https://guava.dev/releases/21.0/api/docs/",
 				"https://asm.ow2.io/javadoc/",
 				"https://docs.oracle.com/javase/8/docs/api/",
 				"http://jenkins.liteloader.com/job/Mixin/javadoc/",
 				"https://logging.apache.org/log4j/2.x/log4j-api/apidocs/",
 				"https://javadoc.lwjgl.org/"
-		);
+		));
 
 		public static @Unmodifiable List<String> getLinks(WovenExtension ext) {
 			List<String> links = new ArrayList<>(LINKS);
