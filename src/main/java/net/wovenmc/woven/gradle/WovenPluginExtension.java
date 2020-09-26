@@ -31,7 +31,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class WovenPluginExtension {
 	private final Project project;
-	public boolean checkstyle = false;
 	public JavaVersion javaVersion = JavaVersion.VERSION_1_8;
 
 	public WovenPluginExtension(@NotNull Project project) {

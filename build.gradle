@@ -21,15 +21,22 @@ if (ENV.BUILD_NUMBER) {
 
 repositories {
 	maven {
-		name = 'Fabric'
-		url = 'https://maven.fabricmc.net/'
+		name 'Fabric'
+		url 'https://maven.fabricmc.net/'
+	}
+	maven {
+		name 'Gradle plugins'
+		url "https://plugins.gradle.org/m2/"
 	}
 	mavenCentral()
 }
 
 dependencies {
-	api 'net.fabricmc:fabric-loom:0.5.25'
 	api 'org.jetbrains:annotations:17.0.0'
+
+	implementation gradleApi()
+	implementation 'net.fabricmc:fabric-loom:0.5.25'
+	implementation 'gradle.plugin.net.minecrell:licenser:0.4.1'
 }
 
 java {

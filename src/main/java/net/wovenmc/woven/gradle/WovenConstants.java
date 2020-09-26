@@ -28,4 +28,21 @@ public class WovenConstants {
 			throw new UnsupportedOperationException("WovenConstants$SourceSets only contains static definitions.");
 		}
 	}
+
+	public static final class Checkstyle {
+		public static final String FILE_NAME = "checkstyle.xml";
+		public static final String VERSION = "8.31";
+
+		private Checkstyle() {
+			throw new UnsupportedOperationException("WovenConstants$Checkstyle only contains static definitions");
+		}
+	}
+
+	public static final class License {
+		public static final String HEADER_FILE = "HEADER";
+
+		private License() {
+			throw new UnsupportedOperationException("WovenConstants$License only contains static definitions");
+		}
+	}
 }
