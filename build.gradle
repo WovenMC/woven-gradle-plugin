@@ -91,7 +91,7 @@ gradlePlugin {
 	plugins {
 		woven {
 			id = 'woven-gradle'
-			description description
+			description project.description
 			implementationClass = 'net.wovenmc.woven.gradle.WovenGradlePlugin'
 		}
 	}
@@ -106,7 +106,7 @@ publishing {
 
 			pom {
 				name = "Woven Gradle Plugin"
-				description = description
+				description = project.description
 			}
 		}
 	}
