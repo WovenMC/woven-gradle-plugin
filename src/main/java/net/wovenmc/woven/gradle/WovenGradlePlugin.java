@@ -33,8 +33,14 @@ import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
 import org.gradle.api.publish.plugins.PublishingPlugin;
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskCollection;
+import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.bundling.AbstractArchiveTask;
+import org.gradle.api.tasks.compile.JavaCompile;
+import org.gradle.api.tasks.javadoc.Javadoc;
+import org.gradle.external.javadoc.StandardJavadocDocletOptions;
 import org.jetbrains.annotations.NotNull;
 
 public class WovenGradlePlugin implements Plugin<Project> {
@@ -42,8 +48,9 @@ public class WovenGradlePlugin implements Plugin<Project> {
 	public void apply(@NotNull Project project) {
 		final PluginContainer plugins = project.getPlugins();
 		final ExtensionContainer extensions = project.getExtensions();
+		final TaskContainer tasks = project.getTasks();
 
-		WovenPluginExtension extension = extensions.create("woven", WovenPluginExtension.class, project);
+		WovenExtension extension = extensions.create("woven", WovenExtension.class, project);
 
 		// Apply default plugins
 		plugins.apply(JavaLibraryPlugin.class);
@@ -54,6 +61,9 @@ public class WovenGradlePlugin implements Plugin<Project> {
 
 		extensions.create("wovenApi", WovenApiExtension.class, project);
 
+		// Dependencies
+		project.getDependencies().add("api", "org.jetbrains:annotations:" + extension.getAnnotationsVersion());
+
 		// Java
 		extensions.configure(JavaPluginExtension.class, ext -> {
 			ext.setSourceCompatibility(extension.javaVersion);
@@ -61,6 +71,32 @@ public class WovenGradlePlugin implements Plugin<Project> {
 
 			ext.withSourcesJar();
 			ext.withJavadocJar();
+		});
+
+		// UTF-8 time
+		tasks.withType(JavaCompile.class).forEach(it -> it.getOptions().setEncoding(WovenConstants.ENCODING));
+
+		// Bundle LICENSE file into the JAR.
+		tasks.withType(AbstractArchiveTask.class).forEach(it -> it.from(project.getRootProject().file("LICENSE")));
+
+		tasks.withType(Javadoc.class).getByName("javadoc", task -> {
+			task.options(it -> {
+				StandardJavadocDocletOptions options = (StandardJavadocDocletOptions) it;
+				options.setSource("8");
+				options.setEncoding(WovenConstants.ENCODING);
+				options.setCharSet(WovenConstants.ENCODING);
+				options.setMemberLevel(WovenConstants.JavaDoc.MEMBER_LEVEL);
+				options.setLinks(WovenConstants.JavaDoc.getLinks(extension));
+				// Disable the crazy super-strict doclint tool in Java 8
+				options.addStringOption("Xdoclint:none", "-quiet");
+			});
+
+			SourceSetContainer sourceSets = project.getExtensions().getByType(SourceSetContainer.class);
+			final SourceSet mainSourceSet = sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
+			task.setClasspath(mainSourceSet.getRuntimeClasspath());
+
+			task.include(WovenConstants.JavaDoc.INCLUDE);
+			task.setFailOnError(false);
 		});
 
 		// Checkstyle
@@ -79,19 +115,19 @@ public class WovenGradlePlugin implements Plugin<Project> {
 		extensions.configure(PublishingExtension.class, ext -> {
 			ext.publications(publications -> {
 				publications.register("maven", MavenPublication.class, publication -> {
-					final TaskCollection<AbstractArchiveTask> tasks = project.getTasks().withType(AbstractArchiveTask.class);
+					final TaskCollection<AbstractArchiveTask> archiveTasks = tasks.withType(AbstractArchiveTask.class);
 
 					// Artifacts
-					final RemapJarTask remapJarTask = (RemapJarTask) tasks.getByName("rempapJar");
+					final RemapJarTask remapJarTask = (RemapJarTask) archiveTasks.getByName("rempapJar");
 					publication.artifact(remapJarTask, artifact -> {
 						artifact.builtBy(remapJarTask);
 					});
 
-					publication.artifact(tasks.getByName("sourcesJar"), artifact -> {
-						artifact.builtBy(tasks.getByName("remapSourcesJar"));
+					publication.artifact(archiveTasks.getByName("sourcesJar"), artifact -> {
+						artifact.builtBy(archiveTasks.getByName("remapSourcesJar"));
 					});
 
-					publication.artifact(tasks.getByName("javadocJar"));
+					publication.artifact(archiveTasks.getByName("javadocJar"));
 
 					// POM
 					publication.pom(pom -> {

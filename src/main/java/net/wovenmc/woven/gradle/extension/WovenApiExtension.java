@@ -32,6 +32,6 @@ public class WovenApiExtension {
 	}
 
 	private String getDependencyNotation(String moduleName, String moduleVersion) {
-		return String.format("net.wovenmc.woven:%s:%s", moduleName, moduleVersion);
+		return String.format("net.wovenmc:%s:%s", moduleName, moduleVersion);
 	}
 }

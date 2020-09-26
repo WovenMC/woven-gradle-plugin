@@ -16,7 +16,18 @@
 
 package net.wovenmc.woven.gradle;
 
+import org.gradle.external.javadoc.JavadocMemberLevel;
+import org.gradle.internal.impldep.com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.Unmodifiable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class WovenConstants {
+	public static final String ANNOTATIONS_VERSION = "20.1.0";
+	public static final String ENCODING = "UTF-8";
+
 	private WovenConstants() {
 		throw new UnsupportedOperationException("WovenConstants only contains static definitions.");
 	}
@@ -26,6 +37,29 @@ public class WovenConstants {
 
 		private SourceSets() {
 			throw new UnsupportedOperationException("WovenConstants$SourceSets only contains static definitions.");
+		}
+	}
+
+	public static final class JavaDoc {
+		public static final String INCLUDE = "**/api/**";
+		public static final JavadocMemberLevel MEMBER_LEVEL = JavadocMemberLevel.PACKAGE;
+		public static final @Unmodifiable List<String> LINKS = ImmutableList.of(
+				"https://guava.dev/releases/21.0/api/docs/",
+				"https://asm.ow2.io/javadoc/",
+				"https://docs.oracle.com/javase/8/docs/api/",
+				"http://jenkins.liteloader.com/job/Mixin/javadoc/",
+				"https://logging.apache.org/log4j/2.x/log4j-api/apidocs/",
+				"https://javadoc.lwjgl.org/"
+		);
+
+		public static @Unmodifiable List<String> getLinks(WovenExtension ext) {
+			List<String> links = new ArrayList<>(LINKS);
+			links.add("https://javadoc.io/doc/org.jetbrains/annotations/" + ext.getAnnotationsVersion());
+			return Collections.unmodifiableList(links);
+		}
+
+		private JavaDoc() {
+			throw new UnsupportedOperationException("WovenConstants$JavaDoc only contains static definitions.");
 		}
 	}
 

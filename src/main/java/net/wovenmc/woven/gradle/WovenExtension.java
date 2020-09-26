@@ -29,12 +29,21 @@ import org.gradle.jvm.tasks.Jar;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
 import org.jetbrains.annotations.NotNull;
 
-public class WovenPluginExtension {
+public class WovenExtension {
 	private final Project project;
+	private String jetbrainsAnnotationsVersion = WovenConstants.ANNOTATIONS_VERSION;
 	public JavaVersion javaVersion = JavaVersion.VERSION_1_8;
 
-	public WovenPluginExtension(@NotNull Project project) {
+	public WovenExtension(@NotNull Project project) {
 		this.project = project;
+	}
+
+	public String getAnnotationsVersion() {
+		return this.jetbrainsAnnotationsVersion;
+	}
+
+	public void withAnnotations(String version) {
+		this.jetbrainsAnnotationsVersion = version;
 	}
 
 	/**

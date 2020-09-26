@@ -8,6 +8,7 @@ plugins {
 
 group = 'net.wovenmc'
 archivesBaseName = 'woven-gradle'
+description = 'A plugin to reduce Woven API modules project boilerplates.'
 def baseVersion = '0.1'
 
 def build = 'local'
@@ -32,7 +33,7 @@ repositories {
 }
 
 dependencies {
-	api 'org.jetbrains:annotations:17.0.0'
+	api 'org.jetbrains:annotations:20.1.0'
 
 	implementation gradleApi()
 	implementation 'net.fabricmc:fabric-loom:0.5.25'
@@ -84,4 +85,33 @@ license {
 checkstyle {
 	configFile = file('checkstyle.xml')
 	toolVersion = '8.31'
+}
+
+gradlePlugin {
+	plugins {
+		woven {
+			id = 'woven-gradle'
+			description description
+			implementationClass = 'net.wovenmc.woven.gradle.WovenGradlePlugin'
+		}
+	}
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifact jar
+			artifact sourcesJar
+			artifact javadocJar
+
+			pom {
+				name = "Woven Gradle Plugin"
+				description = description
+			}
+		}
+	}
+
+	repositories {
+		mavenLocal()
+	}
 }
