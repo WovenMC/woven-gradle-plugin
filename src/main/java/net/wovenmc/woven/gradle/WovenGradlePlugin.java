@@ -188,6 +188,7 @@ public class WovenGradlePlugin implements Plugin<Project> {
 
 				repositories.maven(repo -> {
 					repo.setName("Woven");
+
 					try {
 						repo.setUrl(new URI(WovenConstants.WOVEN_MAVEN));
 					} catch (URISyntaxException e) {
