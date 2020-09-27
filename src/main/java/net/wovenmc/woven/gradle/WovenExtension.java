@@ -33,6 +33,7 @@ public class WovenExtension {
 	private final Project project;
 	private String jetbrainsAnnotationsVersion = WovenConstants.ANNOTATIONS_VERSION;
 	public JavaVersion javaVersion = JavaVersion.VERSION_1_8;
+	public String namespace;
 
 	public WovenExtension(@NotNull Project project) {
 		this.project = project;

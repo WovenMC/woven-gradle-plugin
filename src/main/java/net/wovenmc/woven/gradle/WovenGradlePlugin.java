@@ -23,6 +23,7 @@ import net.minecrell.gradle.licenser.Licenser;
 import net.wovenmc.woven.gradle.extension.WovenApiExtension;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.plugins.BasePluginConvention;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.plugins.JavaLibraryPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
@@ -41,7 +42,13 @@ import org.gradle.api.tasks.bundling.AbstractArchiveTask;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.external.javadoc.StandardJavadocDocletOptions;
+import org.gradle.language.jvm.tasks.ProcessResources;
 import org.jetbrains.annotations.NotNull;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WovenGradlePlugin implements Plugin<Project> {
 	@Override
@@ -49,8 +56,16 @@ public class WovenGradlePlugin implements Plugin<Project> {
 		final PluginContainer plugins = project.getPlugins();
 		final ExtensionContainer extensions = project.getExtensions();
 		final TaskContainer tasks = project.getTasks();
+		final SourceSetContainer sourceSets = extensions.getByType(SourceSetContainer.class);
+		final SourceSet mainSourceSet = sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
 
 		WovenExtension extension = extensions.create("woven", WovenExtension.class, project);
+
+		if (extension.namespace == null) {
+			throw new IllegalStateException("Please specify a namespace in the woven extension.");
+		} else {
+			project.getConvention().getPlugin(BasePluginConvention.class).setArchivesBaseName(extension.namespace.replaceAll("_", "-"));
+		}
 
 		// Apply default plugins
 		plugins.apply(JavaLibraryPlugin.class);
@@ -79,6 +94,25 @@ public class WovenGradlePlugin implements Plugin<Project> {
 		// Bundle LICENSE file into the JAR.
 		tasks.withType(AbstractArchiveTask.class).forEach(it -> it.from(project.getRootProject().file("LICENSE")));
 
+		tasks.withType(ProcessResources.class).forEach(it -> {
+			it.getInputs().property("namespace", extension.namespace);
+			it.getInputs().property("description", project.getDescription());
+			it.getInputs().property("version", project.getVersion());
+
+			it.from(mainSourceSet.getResources().getSrcDirs(), copySpec -> {
+				copySpec.include("fabric.mod.json");
+				Map<String, String> properties = new HashMap<>();
+				properties.put("namespace", extension.namespace);
+				properties.put("description", project.getDescription());
+				properties.put("version", project.getVersion().toString());
+				copySpec.expand(properties);
+			});
+
+			it.from(mainSourceSet.getResources().getSrcDirs(), copySpec -> {
+				copySpec.exclude("fabric.mod.json");
+			});
+		});
+
 		tasks.withType(Javadoc.class).getByName("javadoc", task -> {
 			task.options(it -> {
 				StandardJavadocDocletOptions options = (StandardJavadocDocletOptions) it;
@@ -91,8 +125,6 @@ public class WovenGradlePlugin implements Plugin<Project> {
 				options.addStringOption("Xdoclint:none", "-quiet");
 			});
 
-			SourceSetContainer sourceSets = project.getExtensions().getByType(SourceSetContainer.class);
-			final SourceSet mainSourceSet = sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
 			task.setClasspath(mainSourceSet.getRuntimeClasspath());
 
 			task.include(WovenConstants.JavaDoc.INCLUDE);
@@ -153,7 +185,15 @@ public class WovenGradlePlugin implements Plugin<Project> {
 
 			ext.repositories(repositories -> {
 				repositories.mavenLocal();
-				// @TODO: Woven Maven
+
+				repositories.maven(repo -> {
+					repo.setName("Woven");
+					try {
+						repo.setUrl(new URI(WovenConstants.WOVEN_MAVEN));
+					} catch (URISyntaxException e) {
+						throw new RuntimeException(e);
+					}
+				});
 			});
 		});
 	}

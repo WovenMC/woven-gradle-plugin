@@ -27,6 +27,7 @@ import java.util.List;
 public class WovenConstants {
 	public static final String ANNOTATIONS_VERSION = "20.1.0";
 	public static final String ENCODING = "UTF-8";
+	public static final String WOVEN_MAVEN = "https://maven.wovenmc.net";
 
 	private WovenConstants() {
 		throw new UnsupportedOperationException("WovenConstants only contains static definitions.");

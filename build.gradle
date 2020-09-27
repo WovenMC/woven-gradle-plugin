@@ -93,7 +93,7 @@ checkstyle {
 gradlePlugin {
 	plugins {
 		woven {
-			id = 'woven-gradle'
+			id = 'net.wovenmc.gradle'
 			description project.description
 			implementationClass = 'net.wovenmc.woven.gradle.WovenGradlePlugin'
 		}
@@ -118,5 +118,9 @@ publishing {
 
 	repositories {
 		mavenLocal()
+		maven {
+			name "Woven"
+			url uri("https://maven.wovenmc.net")
+		}
 	}
 }
