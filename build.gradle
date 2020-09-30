@@ -119,8 +119,14 @@ publishing {
 	repositories {
 		mavenLocal()
 		maven {
-			name "Woven"
-			url uri("https://maven.wovenmc.net")
+			name 'Woven'
+			url uri('https://mavenupload.wovenmc.net')
+			if (project.hasProperty('maven_pass')) {
+				credentials {
+					username 'wovenupload'
+					password((String) project.getProperties().get('maven_pass'))
+				}
+			}
 		}
 	}
 }

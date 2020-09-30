@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 public class WovenExtension {
 	private final Project project;
 	private String jetbrainsAnnotationsVersion = WovenConstants.ANNOTATIONS_VERSION;
+	private boolean mavenUpload = true;
 	public JavaVersion javaVersion = JavaVersion.VERSION_1_8;
 	public String namespace;
 
@@ -45,6 +46,14 @@ public class WovenExtension {
 
 	public void withAnnotations(String version) {
 		this.jetbrainsAnnotationsVersion = version;
+	}
+
+	public boolean hasMavenUpload() {
+		return this.mavenUpload;
+	}
+
+	public void withoutMavenUpload() {
+		this.mavenUpload = false;
 	}
 
 	/**

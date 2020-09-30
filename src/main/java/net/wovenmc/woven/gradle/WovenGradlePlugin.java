@@ -186,15 +186,24 @@ public class WovenGradlePlugin implements Plugin<Project> {
 			ext.repositories(repositories -> {
 				repositories.mavenLocal();
 
-				repositories.maven(repo -> {
-					repo.setName("Woven");
+				if (extension.hasMavenUpload()) {
+					repositories.maven(repo -> {
+						repo.setName("Woven");
 
-					try {
-						repo.setUrl(new URI(WovenConstants.WOVEN_MAVEN));
-					} catch (URISyntaxException e) {
-						throw new RuntimeException(e);
-					}
-				});
+						try {
+							repo.setUrl(new URI(WovenConstants.WOVEN_MAVEN_UPLOAD));
+						} catch (URISyntaxException e) {
+							throw new RuntimeException(e);
+						}
+
+						if (project.hasProperty("maven_pass")) {
+							repo.credentials(credentials -> {
+								credentials.setUsername("wovenupload");
+								credentials.setPassword((String) project.getProperties().get("maven_pass"));
+							});
+						}
+					});
+				}
 			});
 		});
 	}
